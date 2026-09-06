@@ -78,5 +78,6 @@ These computations are implementation/sanity audits, not mathematical proofs. Th
 
 ## DOI
 
-Paper DOI: **pending**  
+Paper DOI: `10.5281/zenodo.22541243`  
+All-versions DOI: `10.5281/zenodo.22541242`  
 Software/source-package DOI: `10.5281/zenodo.22541098`
