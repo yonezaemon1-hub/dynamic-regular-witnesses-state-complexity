@@ -1,0 +1,12 @@
+Manuscript license
+
+The manuscript text and PDF in this repository are made available under the
+Creative Commons Attribution 4.0 International license (CC BY 4.0).
+
+Copyright (c) 2026 Ryutaro Yonezu.
+
+License text and terms:
+https://creativecommons.org/licenses/by/4.0/
+
+The MIT License in LICENSE applies to software/audit utilities, not to the
+manuscript text or PDF.

@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite the preprint via the preferred citation below."
+title: "Dynamic Regular Witnesses State-Complexity Source and Audit Package"
+type: software
+authors:
+  - family-names: "Yonezu"
+    given-names: "Ryutaro"
+    affiliation: "Independent Researcher"
+version: "1.0.0"
+date-released: "2026-09-06"
+repository-code: "https://github.com/yonezaemon1-hub/dynamic-regular-witnesses-state-complexity"
+license: MIT
+abstract: >-
+  Source and finite audit materials for the preprint Dynamic Regular Witnesses
+  for Near-Exact State Complexity of Explicit Binary Consensus with Periodic Time.
+keywords:
+  - anonymous dynamic networks
+  - binary consensus
+  - explicit termination
+  - state complexity
+  - periodic time
+  - regular dynamic graphs
+  - causal cones
+  - local memory
+preferred-citation:
+  type: article
+  title: "Dynamic Regular Witnesses for Near-Exact State Complexity of Explicit Binary Consensus with Periodic Time"
+  authors:
+    - family-names: "Yonezu"
+      given-names: "Ryutaro"
+      affiliation: "Independent Researcher"
+  year: 2026

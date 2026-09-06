@@ -1,0 +1,957 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue,
+  pdftitle={Dynamic Regular Witnesses for Near-Exact State Complexity of Explicit Binary Consensus with Periodic Time},
+  pdfauthor={Ryutaro Yonezu}
+}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\newcommand{\Fzero}{F_0}
+\newcommand{\Fone}{F_1}
+\newcommand{\Live}{L}
+
+\title{\textbf{Dynamic Regular Witnesses for Near-Exact State Complexity\\
+of Explicit Binary Consensus with Periodic Time}}
+\author{Ryutaro Yonezu\\\small Independent Researcher}
+\date{September 6, 2026\\\small Version v1.0.0 -- not peer reviewed}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We study deterministic binary consensus with explicit termination in anonymous synchronous
+$1$-interval-connected dynamic networks under one-bit broadcast-counting communication.
+Each round $t$ exposes a free globally aligned phase $\phi_t=t\bmod P$, while the full
+round number is unavailable.  Let $S_n(n,P)$ denote the minimum number of persistent
+states required when the network size $n$ and the phase period $P$ are known
+non-uniformly.
+
+A direct predecessor obtained the known-size bounds
+\[
+2+\left\lceil\frac{\lfloor n/2\rfloor}{P}\right\rceil
+\le S_n(n,P)\le
+2+\left\lceil\frac{n-1}{P}\right\rceil,
+\]
+leaving a factor-two gap in the numerator.  We reduce this to an additive constant.
+The main idea is a \emph{dynamic regular witness}: every communication snapshot is
+regular, so opposite homogeneous executions follow topology-independent phase-augmented
+state orbits, while the topology is rearranged to make two backward causal cones grow
+almost one vertex per round.  Using explicit quartic gadgets, for every $n\ge15$,
+\[
+\boxed{
+2+\left\lceil\frac{n-13}{P}\right\rceil
+\le S_n(n,P)\le
+2+\left\lceil\frac{n-1}{P}\right\rceil.
+}
+\]
+For even $n\ge12$, cubic witnesses improve the lower numerator from $n-13$ to $n-10$.
+Thus, in the unsaturated regime where $n/P\to\infty$, the leading coefficient of the known-size state complexity is one.
+
+We also determine the exact saturation threshold for the minimum possible three
+persistent states:
+\[
+\boxed{
+S_n(n,P)=3\quad\Longleftrightarrow\quad P\ge n-1
+}
+\qquad(n\ge4).
+\]
+The lower direction uses only a static path and combines anonymous path symmetry,
+a forced maximal-speed zero wave, and the binary broadcast alphabet.
+The claims are restricted to the stated model.  We do not claim the full exact formula
+$S_n(n,P)=2+\lceil(n-1)/P\rceil$ for arbitrary state budgets.
+\end{abstract}
+
+\noindent\textbf{Keywords.}
+anonymous dynamic networks; binary consensus; explicit termination; state complexity;
+periodic time; one-bit communication; regular dynamic graphs; causal cones; local memory.
+
+\section{Introduction}
+
+Explicit termination forces an anonymous process to represent evidence that information has
+had enough time to propagate.  This is different from stabilization: a binary consensus
+value can be propagated by a two-state monotone flooding process, while a process that must
+know when it is safe to stop needs additional local timing information.
+
+The state--phase line of work studied this cost when every node receives the free common
+phase
+\[
+\phi_t=t\bmod P
+\]
+but not the absolute round number.  In that model a direct predecessor proved, for known
+network size $n$,
+\[
+2+\left\lceil\frac{\lfloor n/2\rfloor}{P}\right\rceil
+\le S_n(n,P)\le
+2+\left\lceil\frac{n-1}{P}\right\rceil,
+\]
+after improving an earlier split-cycle lower bound.  The upper bound is a block-counter
+implementation of monotone zero flooding with horizon $n-1$.  The remaining question is
+whether the factor-two gap in the lower numerator reflects the task or only the static-cycle
+witness.
+
+This paper shows that the latter is largely responsible.  Static cycles are convenient
+because their homogeneous executions are symmetric, but their ordinary diameter is only
+about $n/2$.  The key observation is that static symmetry is unnecessary.  If every
+snapshot is $d$-regular, then a homogeneous execution is blind to the edge identities:
+every node has the same state, broadcasts the same bit, and receives the same degree-$d$
+count vector.  The adversary can therefore change the regular topology aggressively without
+changing the homogeneous state orbit.
+
+We exploit this freedom by constructing two disjoint backward causal cones.  Each cone has
+a constant-size first expansion forced by regularity and then grows by only one vertex per
+round.  Explicit path/cycle-plus-matching completions fill the rest of every snapshot while
+preserving regularity and connectivity.  The resulting waiting-sum lower bound is
+$n-O(1)$, which combines with two-orbit phase packing to give a near-exact state lower
+bound with leading constant one.
+
+A second result isolates the smallest state budget.  Three persistent states necessarily
+have the normal form ``final zero, one live state, final one.''  On a static path this
+collapses the pre-termination symmetry enough to determine exactly how much free phase is
+needed: three states are possible precisely when the period is at least $n-1$.
+
+\paragraph{Main contributions.}
+\begin{enumerate}[leftmargin=1.5em]
+\item A regular-homogeneous invariance lemma and a dynamic causal-cone construction that
+decouple homogeneous state evolution from mixed-input information propagation.
+\item For all $n\ge15$,
+\[
+2+\left\lceil\frac{n-13}{P}\right\rceil
+\le S_n(n,P)\le
+2+\left\lceil\frac{n-1}{P}\right\rceil.
+\]
+\item For even $n\ge12$, the stronger cubic lower bound
+\[
+S_n(n,P)\ge
+2+\left\lceil\frac{n-10}{P}\right\rceil.
+\]
+\item The exact three-state saturation threshold
+\[
+S_n(n,P)=3\iff P\ge n-1
+\qquad(n\ge4).
+\]
+\item An explicit finite construction audit over $6253$ complete parameter cases; the
+computation is used only to test the constructive lemmas, not as a substitute for proof.
+\end{enumerate}
+
+\section{Relation to prior work}
+
+The direct predecessor is Yonezu's two-orbit packing note~\cite{yonezu2026twoorbit},
+which made the known-diameter state complexity exact and strengthened the known-size lower
+bound to
+$2+\lceil\lfloor n/2\rfloor/P\rceil$.  The present paper addresses the residual known-size
+gap by replacing the static-cycle witness with regular dynamic witnesses and by isolating
+the exact three-state threshold.
+
+Parzych and Daymude study memory lower bounds for terminating broadcast in anonymous,
+synchronous, $1$-interval-connected dynamic networks~\cite{parzych2026}.  Their results
+show that termination memory is a genuine resource in nearby anonymous dynamic settings,
+but the task, start semantics, and objective differ from the periodic-phase binary-consensus
+state complexity considered here.
+
+Blanc, Di Luna, and Viglietta study deterministic computation when every anonymous node
+broadcasts one bit and observes only the numbers of neighboring zero and one broadcasts
+\cite{blanc2026}.  Their results establish broad computational power and round-complexity
+bounds under the same severe communication interface.  They do not give the persistent
+state--phase thresholds studied here.
+
+Di Luna and Viglietta develop finite-state and self-stabilizing computation in anonymous
+dynamic networks~\cite{diluna2024}.  Their finite-state stabilization framework addresses
+general computation rather than exact persistent-state requirements for explicitly
+terminating binary consensus with an externally supplied phase.  Turau gives a randomized
+$O(\log\log n)$-memory algorithm for anonymous dynamic broadcast with stabilizing
+termination~\cite{turau2026}; randomization, the broadcast task, and stabilizing rather
+than explicit termination place that result outside the present state-threshold question.
+
+Modulo-clock synchronization is a different line.  Penet de Monterno, Charron-Bost, and
+Merz synchronize clocks modulo $P$ in dynamic networks~\cite{monterno2023}, and
+Charron-Bost and Penet de Monterno study self-stabilizing clock synchronization
+\cite{charron2022}.  Those works compute or recover a clock signal; here the common
+periodic phase is supplied externally for free, and the question is how many persistent
+states explicit consensus still requires.
+
+A targeted literature search through September 6, 2026 did not identify a prior theorem
+giving either the near-exact $n-O(1)$ numerator bounds or the exact three-state threshold
+for the stated model.  This is a scoped literature-screening statement, not a certification
+of novelty.
+
+\section{Model and definitions}
+
+We use the same state--phase model as the direct predecessor on periodic-time explicit consensus. Fix $n$ and $P$.  Nodes are anonymous, deterministic, and execute identical code.
+In propagation round $t$, the adversary chooses a simple undirected connected graph
+$G_{t+1}$.  Each node broadcasts one bit to all current neighbors and observes only
+the pair $(c_0,c_1)$ of received zero and one broadcasts.  The common free phase is
+\[
+\phi_t=t\bmod P.
+\]
+The broadcast and transition functions have the form
+\[
+\sigma:Q\times\{0,\ldots,P-1\}\to\{0,1\},
+\]
+\[
+\delta:Q\times\{0,\ldots,P-1\}\times\mathbb N\times\mathbb N\to Q.
+\]
+The initialization is deterministic; write $\iota(b)\in Q$ for the persistent state
+of an input-$b$ node at time $0$.  Finality and output depend only on persistent state.
+Once a final state is entered, the persistent state and output never change, although
+the node remains communication-present.
+
+\section{Dynamic causal locality and regular homogeneous orbits}
+
+For a target $v$ at time $T$, define its backward causal sets by
+\[
+B_T(v)=\{v\},
+\qquad
+B_t(v)=B_{t+1}(v)\cup N_{G_{t+1}}(B_{t+1}(v))
+\quad(0\le t<T).
+\]
+
+\begin{lemma}[Dynamic causal-cone locality]
+Fix a graph sequence and a target $v$ at time $T$.  If two executions have the same
+initial persistent states on $B_0(v)$, then $v$ has the same state at every time
+$0,\ldots,T$ in the two executions.
+\end{lemma}
+
+\begin{proof}
+Induct backward through the dependency relation.  The state of a node at time $t+1$
+depends only on its own state at time $t$, the common phase $\phi_t$, and the broadcast
+bits of its neighbors in $G_{t+1}$.  Thus every dependency of the target at time $T$
+is contained in the recursively defined backward cone.  The phase sequence is common
+to the two executions, so equality of the initial states on $B_0(v)$ implies equality
+of all states and broadcasts that can influence $v$ through time $T$.
+\end{proof}
+
+\begin{lemma}[Regular homogeneous invariance]
+Fix $d\ge1$.  On every dynamic graph sequence whose snapshots are all $d$-regular,
+a homogeneous input execution has one common persistent state $q_t$ at every node
+at each time $t$.  Moreover, the augmented state $(q_t,\phi_t)$ evolves by a
+deterministic map
+\[
+G_d:Q\times\{0,\ldots,P-1\}\to Q\times\{0,\ldots,P-1\}
+\]
+that is independent of the particular $d$-regular topology schedule.
+\end{lemma}
+
+\begin{proof}
+If all nodes have the same state $q$ at phase $\phi$, they broadcast the same bit
+$\sigma(q,\phi)$.  Every node has degree $d$, so every node receives the same count
+vector, either $(d,0)$ or $(0,d)$.  Determinism therefore gives the same next state
+at every node.  The observation depends only on $(q,\phi,d)$, not on the identities
+of the incident edges or on the topology schedule.
+\end{proof}
+
+For $b\in\{0,1\}$, let $\tau_b$ be the first final time in the homogeneous input-$b$
+execution on a $d$-regular schedule.  By the preceding lemma, $\tau_b$ depends on
+the algorithm, $n,P$, and $d$, but not on the particular $d$-regular schedule.
+
+\begin{lemma}[Regular two-orbit packing]
+For the two opposite homogeneous executions on $d$-regular schedules,
+\[
+P|Q|\ge \tau_0+\tau_1+2P.
+\]
+\end{lemma}
+
+\begin{proof}
+The proof is the same phase-augmented packing argument used for homogeneous static
+cycles.  Before the first final time, an augmented state cannot repeat within either
+homogeneous orbit, or deterministic iteration of $G_d$ would loop and prevent first
+termination.  The two pre-final augmented orbits are disjoint: if they met, the two
+deterministic suffixes would coincide and eventually reach the same final output,
+contradicting opposite unanimity requirements.  Finally, the distinct immutable
+final states reached by the two homogeneous executions each sweep through all $P$
+phase values.  Hence the augmented state space contains at least
+$\tau_0+\tau_1+2P$ distinct pairs.
+\end{proof}
+
+\section{Explicit regular protected blocks}
+
+\begin{lemma}[Quartic protected block]
+Let $S$ be a vertex set of size $s\ge5$ and let $x\notin S$.  There is a simple
+connected partial graph on $S\cup\{x\}$ such that every vertex of $S$ has degree $4$,
+\[
+N(S)\setminus S=\{x\},
+\]
+and $x$ has exactly two incident edges into $S$.
+For $s=5$, any prescribed target $z\in S$ can be chosen to have all four neighbors
+inside $S$.
+\end{lemma}
+
+\begin{proof}
+Start from the square $C_s^2$, which is $4$-regular for $s\ge5$.
+Delete one edge $uv$ and add $ux$ and $vx$.  All vertices of $S$ again have degree
+$4$, while $x$ has two incident edges into $S$.  For $s=5$, $C_5^2=K_5$; choose
+the deleted edge disjoint from the prescribed target $z$.
+\end{proof}
+
+\begin{lemma}[Cubic protected block]
+Let $S$ be a vertex set of size $s\ge4$ and let $x\notin S$.
+There is a simple connected partial graph in which every vertex of $S$ has degree $3$
+and $N(S)\setminus S=\{x\}$.  If $s$ is even, $x$ has two incident edges into $S$;
+if $s$ is odd, $x$ has one incident edge into $S$.
+For $s=4$, any prescribed target $z\in S$ can be chosen to have all three neighbors
+inside $S$.
+\end{lemma}
+
+\begin{proof}
+If $s$ is even, take a cycle $C_s$ and add the opposite-vertex perfect matching,
+pairing vertex $i$ with $i+s/2$ (indices modulo $s$).  These are non-cycle edges
+for $s\ge4$, so the result is a connected cubic graph.  Delete one matching edge
+$uv$ and add $ux,vx$.
+For $s=4$ this is $K_4$ with one edge replaced by the two edges to $x$, and the
+deleted edge can be chosen disjoint from the prescribed target.
+
+If $s=2h+1$ is odd, take $C_s$ and a matching
+\[
+\{\, i(i+h): 1\le i\le h\,\}
+\]
+on the vertices $1,\ldots,2h$, leaving vertex $0$ unmatched.  The matching edges
+are non-cycle edges because $h\ge2$.  Add the edge $0x$.  Every vertex of $S$
+then has degree $3$, and $x$ has one edge into $S$.
+\end{proof}
+
+\section{Explicit completion of the complement}
+
+\begin{lemma}[Quartic complement completion]
+Let $R$ be a vertex set with $|R|\ge6$.  Mark at most two vertices of $R$ as
+connectors.  Require each connector to have degree $2$ inside $R$ and every other
+vertex to have degree $4$.  Then there is a simple connected graph on $R$ realizing
+those degrees.
+\end{lemma}
+
+\begin{proof}
+With no connector, use $C_{|R|}^2$.
+
+With one connector $x$, write the remaining vertices as
+$o_1,\ldots,o_q$, where $q\ge5$.  Use the cycle
+\[
+x,o_1,o_2,\ldots,o_q,x,
+\]
+so every vertex currently has degree $2$.  Add a Hamiltonian cycle on the ordinary
+vertices that avoids the path edges $o_io_{i+1}$.  One explicit order is
+\[
+o_1,o_3,o_5,\ldots,o_2,o_4,o_6,\ldots,o_1,
+\]
+with the odd and even subsequences truncated in the natural way.  For $q\ge5$,
+none of its edges is a path edge.  The ordinary vertices reach degree $4$ while
+$x$ remains degree $2$.
+
+With two connectors $x,y$ and $|R|\ge7$, use the base cycle
+\[
+x,o_1,\ldots,o_q,y,x
+\]
+and the same edge-disjoint Hamiltonian cycle on the $q\ge5$ ordinary vertices.
+Both connectors have degree $2$ and all ordinary vertices degree $4$.
+
+The only remaining case is $|R|=6$ with two connectors.  Start from $K_6$ and
+delete the five edges
+\[
+xy,\ xa,\ xb,\ yc,\ yd,
+\]
+where $a,b,c,d$ are the four ordinary vertices.  The connectors then have degree
+$2$ and all ordinary vertices degree $4$.  The resulting graph is connected.
+\end{proof}
+
+\begin{lemma}[Cubic complement completion]
+Let $R$ be a vertex set with $|R|\ge5$.  Mark at most two vertices as connectors,
+each with required degree $1$ or $2$ inside $R$, and require every ordinary vertex
+to have degree $3$.  If the total required degree is even, then a simple connected
+realization exists.
+\end{lemma}
+
+\begin{proof}
+The parity condition is necessary by the handshake lemma.  We give explicit
+realizations.
+
+With no connector, the parity condition makes $|R|$ even.  Use a cycle plus a
+perfect matching on opposite vertices.
+
+With one connector $x$ of required degree $2$, use the cycle
+\[
+x,o_1,\ldots,o_q,x
+\]
+and add a perfect matching on the even number $q$ of ordinary vertices, using
+non-path edges.  If $x$ has required degree $1$, use a cycle on the odd number
+$q$ of ordinary vertices, attach $x$ to $o_1$, and add a perfect matching on
+$o_2,\ldots,o_q$ using non-cycle edges.
+
+With two connectors of required degrees $(1,1)$, use the path
+\[
+x,o_1,\ldots,o_q,y
+\]
+and add a perfect matching on the even number $q$ of ordinary vertices.
+For degrees $(2,2)$, use the cycle
+\[
+x,o_1,\ldots,o_q,y,x
+\]
+and again add a perfect matching on the even number $q$ of ordinary vertices.
+For degrees $(1,2)$ and $q\ge5$, use the cycle
+\[
+y,o_1,o_2,\ldots,o_q,y,
+\]
+attach $x$ to $o_1$, and add a perfect matching on
+$o_2,\ldots,o_q$.  The parity condition makes $q$ odd.
+
+In every matching step above, the vertices to be matched form an even ordered list
+$w_1,\ldots,w_m$ with $m\ge4$, except for the special case below.  Pair
+$w_i$ with $w_{i+m/2}$ for $1\le i\le m/2$.  Each pair is separated by at
+least two positions in the displayed path or cycle, so no matching edge duplicates
+an existing edge.  The only size-five case not covered by these formulas is
+$q=3$ with connector degrees $(1,2)$.  On vertices $x,y,a,b,c$, take $K_5$ and
+delete
+\[
+xy,\ xa,\ xb,\ yc.
+\]
+The remaining degrees are respectively $1,2,3,3,3$, and the graph is connected.
+\end{proof}
+
+\section{Slow disjoint causal cones}
+
+\begin{proposition}[Quartic slow-cone schedule]
+Let $n\ge15$ and let $t_0,t_1\ge0$ satisfy
+\[
+t_0+t_1\le n-14.
+\]
+There exists a sequence of connected $4$-regular graphs and two targets
+$z_0,z_1$ such that their backward causal cones through horizons $t_0,t_1$
+are disjoint at time $0$.
+\end{proposition}
+
+\begin{proof}
+Choose disjoint vertex pools $U_b$ of size $t_b+4$, choose a target
+$z_b\in U_b$ for each $b\in\{0,1\}$, and let
+\[
+M=V\setminus(U_0\cup U_1).
+\]
+The hypothesis gives $|M|\ge6$.
+
+For each $b$ with $t_b>0$, construct nested sets
+\[
+C_b(t_b)=\{z_b\},
+\]
+\[
+|C_b(t_b-1)|=5,
+\]
+and, for $0\le t\le t_b-2$,
+\[
+C_b(t)=C_b(t+1)\cup\{x_{b,t}\},
+\]
+using fresh vertices from $U_b$.  Thus $|C_b(0)|=t_b+4$.
+
+We now choose the snapshot $G_{t+1}$ independently for each round $t$.
+For each active target $b$ with $t<t_b$, impose one protected block.
+
+If $t=t_b-1$, apply the quartic protected-block lemma to
+$S=C_b(t)$.  Choose its external connector in $M$, distinct from the connector
+of any other protected block in the same snapshot, and choose the deleted edge
+disjoint from $z_b$.  Then all four neighbors of $z_b$ lie in $C_b(t)$, so the
+one-step backward predecessor of $\{z_b\}$ is exactly $C_b(t)$.
+
+If $t\le t_b-2$, apply the protected-block lemma to
+$S=C_b(t+1)$ with external connector
+$x_{b,t}=C_b(t)\setminus C_b(t+1)$.  Then
+\[
+C_b(t+1)\cup N_{G_{t+1}}(C_b(t+1))=C_b(t).
+\]
+
+The protected sets are disjoint, and their connectors are distinct and lie
+outside both protected sets.  Remove the protected-set vertices from consideration
+and let $R$ be the remaining vertices, including the at most two connectors.
+Because each protected set lies inside its pool,
+\[
+|R|\ge |M|\ge6.
+\]
+Each connector already has two edges into its protected block and therefore needs
+degree $2$ inside $R$; every other vertex of $R$ needs degree $4$.
+Complete $R$ by the quartic complement-completion lemma.
+The union is simple, connected, and $4$-regular.
+
+For every positive horizon, induction on the backward-cone recursion gives that the
+exact cone of $z_b$ at time $t$ is $C_b(t)$ for every relevant $t$.  When $t_b=0$
+the time-zero cone is simply $\{z_b\}$.  Hence in all cases the two time-zero
+cones are contained in the disjoint pools $U_0,U_1$.
+\end{proof}
+
+\begin{proposition}[Cubic slow-cone schedule]
+Let $n\ge12$ be even and let $t_0,t_1\ge0$ satisfy
+\[
+t_0+t_1\le n-11.
+\]
+There exists a sequence of connected $3$-regular graphs and two targets whose
+time-zero backward causal cones through horizons $t_0,t_1$ are disjoint.
+\end{proposition}
+
+\begin{proof}
+Choose disjoint pools $U_b$ of size $t_b+3$, choose a target
+$z_b\in U_b$ for each $b\in\{0,1\}$, and let
+$M=V\setminus(U_0\cup U_1)$, so $|M|\ge5$.
+For each $b$ with $t_b>0$, construct nested sets exactly as above, except that
+the first backward expansion has size $4$ and each earlier round adds one vertex.
+At a first-expansion round, choose the external connector in $M$, distinct from
+any other connector in that snapshot; at earlier rounds use the fresh pool vertex
+that is added to the nested cone.
+
+Use the cubic protected-block lemma for each active target.  A connector has
+two incident block edges when the protected-set size is even and one incident
+block edge when that size is odd, so it requires residual degree $1$ or $2$
+inside the complement.  All non-connectors require degree $3$ there.
+At every round the complement has at least five vertices.  It remains only
+to check the parity condition in the cubic complement-completion lemma.
+Let $S$ be the union of the protected blocks and let $e_{\rm cut}$ be the
+number of already fixed block-to-connector edges.  Since every vertex of $S$
+already has degree $3$,
+\[
+3|S|=2|E(S)|+e_{\rm cut},
+\]
+so
+\[
+e_{\rm cut}\equiv |S|\pmod 2.
+\]
+The required degree sum inside the complement $R=V\setminus S$ is
+\[
+3|R|-e_{\rm cut}
+\equiv |R|-|S|
+\equiv n
+\equiv0\pmod2,
+\]
+because $n$ is even.  Hence the cubic complement-completion lemma applies.
+
+As in the quartic case, induction on the backward-cone recursion gives the
+prescribed nested sets exactly for positive horizons, while a zero-horizon cone is
+the singleton target.  The two time-zero cones are therefore disjoint.
+\end{proof}
+
+\section{Near-exact known-size lower bounds}
+
+\begin{theorem}[Quartic known-size lower bound]
+For every $n\ge15$ and $P\ge1$,
+\[
+\boxed{
+S_n(n,P)\ge
+2+\left\lceil\frac{n-13}{P}\right\rceil.
+}
+\]
+\end{theorem}
+
+\begin{proof}
+Fix a correct algorithm with state set $Q$, and let $\tau_0,\tau_1$ be the two
+homogeneous first-final times on $4$-regular schedules.
+
+If $\tau_0+\tau_1\le n-14$, the quartic slow-cone proposition gives a connected
+$4$-regular schedule with two targets whose time-zero backward cones are disjoint.
+Assign input $0$ to every node in the first cone and input $1$ to every node in
+the second cone; assign the remaining inputs arbitrarily.  By dynamic causal-cone
+locality, target $b$ reproduces its homogeneous input-$b$ history through time
+$\tau_b$ and therefore reaches an immutable final output $b$.  The two opposite
+final decisions coexist, contradicting agreement.  Hence
+\[
+\tau_0+\tau_1\ge n-13.
+\]
+Regular two-orbit packing now gives
+\[
+P|Q|\ge n-13+2P,
+\]
+which is equivalent to the stated bound.
+\end{proof}
+
+\begin{theorem}[Even-size cubic refinement]
+For every even $n\ge12$ and $P\ge1$,
+\[
+\boxed{
+S_n(n,P)\ge
+2+\left\lceil\frac{n-10}{P}\right\rceil.
+}
+\]
+\end{theorem}
+
+\begin{proof}
+Use the cubic slow-cone proposition.  Correctness implies
+\[
+\tau_0+\tau_1\ge n-10
+\]
+for the two homogeneous first-final times on cubic schedules.  Applying regular
+two-orbit packing yields
+\[
+P|Q|\ge n-10+2P,
+\]
+and hence the result.
+\end{proof}
+
+Combining the quartic lower bound with the existing block-counter upper bound gives,
+for $n\ge15$,
+\[
+2+\left\lceil\frac{n-13}{P}\right\rceil
+\le S_n(n,P)\le
+2+\left\lceil\frac{n-1}{P}\right\rceil.
+\]
+For even $n\ge12$, the left side improves by replacing $n-13$ with $n-10$.
+
+\section{Exact three-state phase threshold}
+
+\begin{lemma}[Three-state normal form]
+Suppose a correct algorithm has exactly three persistent states.  Then, after
+possibly exchanging the names $0$ and $1$, its states may be written
+\[
+Q=\{\Fzero,\Live,\Fone\},
+\]
+where $\Fzero,\Fone$ are distinct immutable final states with outputs $0,1$,
+$\Live$ is the unique nonfinal state, and
+\[
+\iota(0)=\Fzero,\qquad \iota(1)=\Live.
+\]
+\end{lemma}
+
+\begin{proof}
+Unanimity requires that some reachable final state output $0$ and some distinct
+reachable final state output $1$.  Thus at least two states are final.
+A correct mixed execution cannot start with both input values already in opposite
+immutable final states, so a nonfinal state is also necessary.  With only three
+states, there are therefore exactly two relevant final states and exactly one
+nonfinal state $\Live$.
+
+An input-$b$ node cannot initialize in the opposite final state, because that would
+already violate unanimity in the homogeneous input-$b$ execution.  If both input
+values initialized in $\Live$, their homogeneous executions would be identical and
+could not terminate with opposite outputs.  If both initialized in their respective
+final states, a mixed input would start with opposite immutable decisions.
+Hence exactly one input initializes final and the other initializes in $\Live$.
+Exchange the bit names if necessary.
+\end{proof}
+
+\begin{lemma}[Path symmetry before the first one-finalization]
+Run a three-state algorithm in the all-one execution on the static path
+\[
+v_0-v_1-\cdots-v_{n-1}.
+\]
+Before the first transition into $\Fone$, every node is in state $\Live$.
+At every such time, the two endpoints have identical local observations and all
+interior vertices have identical local observations.  Consequently the first
+$\Fone$ transition, when it occurs, is simultaneous on the entire endpoint class,
+the entire interior class, or both.
+\end{lemma}
+
+\begin{proof}
+No node may enter $\Fzero$ in the all-one execution, because $\Fzero$ is immutable
+with output $0$.  Since $\Live$ is the only nonfinal state, every node therefore
+remains in $\Live$ until the first $\Fone$ transition.  The two endpoints each see
+one $\Live$ neighbor, while every interior node sees two $\Live$ neighbors.
+The phase is common and the transition rule is anonymous and deterministic.
+\end{proof}
+
+
+\begin{lemma}[Forced maximal zero wave at the boundary]
+Assume the three-state normal form and suppose that, in the all-one execution
+on $P_n$, the first final-one event is interior-only at time
+\[
+P=n-2.
+\]
+In the mixed execution with $v_0$ initially zero and all other inputs one,
+correctness forces, for every $0\le j\le P-2$,
+\[
+q_{v_j}(j)=\Fzero,
+\qquad
+q_{v_{j+1}}(j)=\Live,
+\]
+and the propagation-round-$j$ transition at the frontier satisfies
+\[
+\delta\!\left(
+\Live,\phi_j,
+\text{one broadcast from }\Fzero
+\text{ and one broadcast from }\Live
+\right)=\Fzero.
+\]
+Consequently
+\[
+\sigma(\Fzero,\phi_j)\ne\sigma(\Live,\phi_j)
+\qquad(0\le j\le P-2).
+\]
+Moreover the same inequality also holds at phase $P-1$.
+\end{lemma}
+
+\begin{proof}
+The zero source $v_0$ is permanently in $\Fzero$, and correctness forbids any
+node from entering $\Fone$ in the same mixed execution.  The only remaining
+state is therefore $\Live$.
+
+In the all-one execution, $v_{n-2}$ enters $\Fone$ at time $P=n-2$.
+For the mixed execution to avoid that same transition, the causal difference
+originating at $v_0$ must affect the round-$P-1$ observation of $v_{n-2}$.
+The distance from $v_0$ to $v_{n-3}$ is exactly
+\[
+n-3=P-1.
+\]
+One-hop-per-round causality leaves no slack: a delay in any one of rounds
+$0,\ldots,P-2$ cannot be recovered later.  Hence at time $j$ the influence
+frontier must already have reached $v_j$, and because $\Fone$ is forbidden,
+the differing state there must be $\Fzero$.  The next vertex $v_{j+1}$ is
+still outside the causal influence and remains in $\Live$ at the beginning
+of round $j$.  To advance the frontier, its next state must be $\Fzero$.
+This proves the displayed transition.
+
+If the two broadcasts at phase $\phi_j$ were equal, the frontier vertex
+$v_{j+1}$ would receive exactly the same count vector as its all-one
+counterpart and could not make the required different transition.  Thus the
+broadcasts differ for $0\le j\le P-2$.
+
+At the last phase $P-1$, the vertex $v_{n-2}$ begins the round in $\Live$.
+Its neighbors are $v_{n-3}\in\Fzero$ and $v_{n-1}\in\Live$.  If the two
+broadcasts were equal at that phase, its received count vector would again
+equal the all-one count vector, forcing the forbidden transition into
+$\Fone$.  Hence the inequality also holds at phase $P-1$.
+\end{proof}
+
+\begin{theorem}[Exact three-state threshold]
+For every $n\ge4$ and $P\ge1$,
+\[
+\boxed{
+S_n(n,P)=3
+\quad\Longleftrightarrow\quad
+P\ge n-1.
+}
+\]
+\end{theorem}
+
+\begin{proof}
+Any correct algorithm needs at least three persistent states: unanimity requires
+distinct immutable final states for outputs $0$ and $1$, while mixed-input
+correctness requires a nonfinal state.  The existing block-counter construction
+with horizon $H=n-1$ uses one live state and two final states when $P\ge n-1$.
+Hence $S_n(n,P)=3$ in that regime.
+
+For the converse, suppose that a correct three-state algorithm exists with
+$P\le n-2$.  Put it in the normal form
+$\{\Fzero,\Live,\Fone\}$.
+
+Consider the all-one execution on the static path $P_n$, and let $T$ be the first
+time at which some node enters $\Fone$.  If no $\Fone$ appears during the first
+$P$ propagation rounds, then at time $P$ every node is again in $\Live$ and the
+phase is again $0$.  The entire global configuration has repeated, so the execution
+would never terminate.  Hence
+\[
+T\le P\le n-2.
+\]
+
+If an endpoint is among the first nodes entering $\Fone$, put a single zero at the
+opposite endpoint.  Its distance is $n-1>T$, so the first endpoint has exactly the
+same local history through time $T$ as in the all-one execution and enters
+$\Fone$, while the zero endpoint is already in the immutable state $\Fzero$.
+This violates agreement.
+
+Thus the first event is interior-only.  By path symmetry all interior vertices
+enter $\Fone$ simultaneously.  If $T<n-2$, put a single zero at $v_0$.
+The vertex $v_{n-2}$ is at distance $n-2>T$ from that zero, so its local history
+through time $T$ is unchanged and it enters $\Fone$, again conflicting with the
+immutable $\Fzero$ at $v_0$.  Therefore the only remaining case is
+\[
+T=P=n-2,
+\]
+with all interior vertices entering $\Fone$ at time $P$ and both endpoints still
+in $\Live$.
+
+For each phase $\phi$, define the broadcast bits
+\[
+a_\phi=\sigma(\Fzero,\phi),\qquad
+\ell_\phi=\sigma(\Live,\phi),\qquad
+b_\phi=\sigma(\Fone,\phi).
+\]
+
+Apply the forced maximal zero-wave lemma.  In terms of the broadcast
+notation just introduced, it gives
+\[
+a_\phi\ne\ell_\phi
+\qquad\text{for every }\phi\in\{0,\ldots,P-1\},
+\]
+and, for phases $0,\ldots,P-2$, it also gives the concrete frontier transition
+$\Live\to\Fzero$ when an interior live node sees one $\Fzero$ neighbor and one
+$\Live$ neighbor.
+
+Return to the all-one execution.  At time $P$ every interior vertex is in the
+immutable state $\Fone$, while the two endpoints are still in $\Live$.
+Termination requires each endpoint eventually to enter $\Fone$.
+Let $r\ge P$ be a propagation round at whose end an endpoint first enters
+$\Fone$, and put
+\[
+\psi=r\bmod P.
+\]
+At the beginning of round $r$ that endpoint is in $\Live$ and its unique neighbor
+is in $\Fone$.  During the first phase-$\psi$ round of the execution, the same
+endpoint was in $\Live$ with a unique $\Live$ neighbor and remained in $\Live$.
+Therefore
+\[
+b_\psi\ne\ell_\psi.
+\]
+Since the broadcast alphabet is binary and also
+$a_\psi\ne\ell_\psi$, necessarily
+\[
+a_\psi=b_\psi.
+\]
+
+Finally, take a static path and choose a target endpoint $u$.
+Place a single zero at the vertex whose distance from $u$ is $\psi+1$; all other
+inputs are one.  The forced frontier transitions above propagate $\Fzero$ toward
+$u$ at one edge per round during phases $0,\ldots,\psi-1$.  Hence at the beginning
+of propagation round $\psi$, the unique neighbor of $u$ is in $\Fzero$, while
+$u$ itself is still in $\Live$.  The endpoint therefore sees the same received
+bit $a_\psi=b_\psi$ that caused an all-one endpoint with an $\Fone$ neighbor to
+enter $\Fone$ at phase $\psi$.  Determinism forces $u$ into $\Fone$.
+The source zero remains permanently in $\Fzero$, contradicting agreement.
+
+Hence no three-state algorithm exists when $P\le n-2$.
+\end{proof}
+
+
+\section{Construction audit}
+
+The graph lemmas above are explicit and constitute the proof.  As a separate implementation
+audit, the constructions were independently instantiated over finite parameter ranges and
+their claimed invariants were recomputed from the generated snapshots.
+
+For quartic schedules, every ordered pair $(t_0,t_1)$ with
+\[
+15\le n\le40,\qquad t_0,t_1\ge0,\qquad t_0+t_1\le n-14
+\]
+was checked, for a total of $3653$ cases.  For cubic schedules, every ordered pair with
+\[
+12\le n\le40,\quad n\text{ even},\qquad
+t_0,t_1\ge0,\qquad t_0+t_1\le n-11
+\]
+was checked, for a total of $2600$ cases.  Across all $6253$ complete schedules, every
+snapshot was simple, connected, and exactly regular of the intended degree; recomputed
+backward causal cones matched the prescribed nested cones; and the two time-zero cones were
+disjoint.  No construction failure was observed.
+
+These checks are not part of the mathematical proof and do not establish the theorem for
+unbounded $n$.  Their purpose is to test the indexing and explicit graph constructions used
+in the proof.
+
+\section{Consequences and remaining gap}
+
+Whenever $n/P\to\infty$ (in particular, for fixed or sufficiently slowly growing $P$), the quartic theorem and the block-counter upper bound give
+\[
+S_n(n,P)=\frac{n}{P}+O(1)
+\]
+with leading constant one.  At $P=1$ the general bounds become
+\[
+n-11\le S_n(n,1)\le n+1
+\qquad(n\ge15),
+\]
+while even $n\ge12$ improves the lower side to
+\[
+n-8\le S_n(n,1)\le n+1.
+\]
+
+The exact three-state result identifies the first saturation boundary:
+\[
+P_{\min}^{(3)}(n)=n-1.
+\]
+It does not by itself imply the full feasible-region formula for larger state budgets.
+In particular, we leave open whether
+\[
+S_n(n,P)=2+\left\lceil\frac{n-1}{P}\right\rceil
+\]
+holds for all $n$ and $P$, or whether dynamic topology can be used by algorithms as a
+distributed spatial memory to beat the block-counter upper construction for intermediate
+state budgets.
+
+\section{Claim boundary and limitations}
+
+The paper does not claim novelty for finite-state pumping, deterministic trajectory
+packing in general, causal-cone locality, regular graph constructions, monotone flooding,
+periodic clocks, or generic time--space tradeoffs.  The claimed contribution is the
+task-specific use of regular dynamic witnesses to sharpen the known-size state lower bound
+to within an additive constant of the existing upper numerator, together with the exact
+three-state phase threshold.
+
+The model assumes deterministic anonymous synchronous leaderless
+$1$-interval-connected dynamic networks; a free globally aligned period-$P$ phase; output
+and finality encoded in persistent state rather than in the phase; final nodes remaining
+present in communication; and one-bit broadcast-counting communication.  Randomization,
+identifiers, ports, leaders, Byzantine faults, asynchronous execution, and
+disappearance-on-finalization semantics are outside scope.
+
+\section{Conclusion}
+
+Regularity lets a dynamic adversary preserve the homogeneous state orbit while changing
+the geometry of causal influence.  This separates two roles that were entangled in the
+previous static-cycle lower bound: symmetry of the unanimous executions and propagation
+distance in a mixed execution.  Explicit quartic and cubic schedules then force the sum of
+the two homogeneous first-final times to be $n-O(1)$, and two-orbit phase packing converts
+that waiting into a near-exact persistent-state lower bound.
+
+At the minimum state budget, the structure is sharper.  Three states leave only one live
+state, and on a static path this forces a maximal-speed zero wave at the critical boundary.
+The one-bit alphabet then makes final-zero and final-one communication indistinguishable at
+some phase, yielding the exact threshold $P=n-1$.
+
+The remaining problem is no longer a factor-two uncertainty.  It is whether the final
+additive gap can be closed for arbitrary state budgets.
+
+\begin{thebibliography}{99}
+
+\bibitem{yonezu2026statephase}
+R. Yonezu,
+``Internal Time as Local Memory: State--Phase Tradeoffs for Explicit Termination in Anonymous Dynamic Binary Consensus,''
+Zenodo preprint, version 2.0.0, September 2, 2026.
+DOI: \href{https://doi.org/10.5281/zenodo.22228873}{10.5281/zenodo.22228873}.
+
+\bibitem{yonezu2026twoorbit}
+R. Yonezu,
+``Two-Orbit Packing for Exact State Complexity of Explicit Binary Consensus in Anonymous Dynamic Networks with Periodic Time,''
+Zenodo preprint, version 1.0.0, September 6, 2026.
+DOI: \href{https://doi.org/10.5281/zenodo.22538052}{10.5281/zenodo.22538052}.
+This preprint is the direct predecessor of the present work and is not treated here as
+independent prior art for novelty purposes.
+
+\bibitem{blanc2026}
+T. Blanc, G. A. Di Luna, and G. Viglietta,
+``Computing in Anonymous Dynamic Networks with One-Bit Communications,''
+arXiv:2607.08358, 2026.
+
+\bibitem{parzych2026}
+G. Parzych and J. J. Daymude,
+``Memory Lower Bounds and Impossibility Results for Anonymous Dynamic Broadcast,''
+\emph{Distributed Computing}, vol. 39, no. 3, Art. 18, 2026.
+DOI: \href{https://doi.org/10.1007/s00446-026-00511-4}{10.1007/s00446-026-00511-4}.
+
+\bibitem{diluna2024}
+G. A. Di Luna and G. Viglietta,
+``Universal Finite-State and Self-Stabilizing Computation in Anonymous Dynamic Networks,''
+in \emph{OPODIS 2024}, LIPIcs 324, Art. 10, 2024.
+DOI: \href{https://doi.org/10.4230/LIPIcs.OPODIS.2024.10}{10.4230/LIPIcs.OPODIS.2024.10}.
+
+\bibitem{turau2026}
+V. Turau,
+``Broadcasts in Anonymous, Dynamic Networks: A New Algorithm and Impossibility Results,''
+in \emph{SAND 2026}, LIPIcs 373, Art. 6, 2026.
+DOI: \href{https://doi.org/10.4230/LIPIcs.SAND.2026.6}{10.4230/LIPIcs.SAND.2026.6}.
+
+\bibitem{monterno2023}
+L. Penet de Monterno, B. Charron-Bost, and S. Merz,
+``Synchronization modulo $P$ in Dynamic Networks,''
+\emph{Theoretical Computer Science}, vol. 942, pp. 200--212, 2023.
+
+\bibitem{charron2022}
+B. Charron-Bost and L. Penet de Monterno,
+``Self-Stabilizing Clock Synchronization in Dynamic Networks,''
+in \emph{OPODIS 2022}, LIPIcs 253, Art. 28, 2022.
+DOI: \href{https://doi.org/10.4230/LIPIcs.OPODIS.2022.28}{10.4230/LIPIcs.OPODIS.2022.28}.
+
+\end{thebibliography}
+
+\end{document}
