@@ -9,6 +9,7 @@ authors:
 version: "1.0.0"
 date-released: "2026-09-06"
 repository-code: "https://github.com/yonezaemon1-hub/dynamic-regular-witnesses-state-complexity"
+doi: "10.5281/zenodo.22541098"
 license: MIT
 abstract: >-
   Source and finite audit materials for the preprint Dynamic Regular Witnesses
