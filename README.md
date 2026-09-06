@@ -79,4 +79,4 @@ These computations are implementation/sanity audits, not mathematical proofs. Th
 ## DOI
 
 Paper DOI: **pending**  
-Software/source-package DOI: **pending**
+Software/source-package DOI: `10.5281/zenodo.22541098`
