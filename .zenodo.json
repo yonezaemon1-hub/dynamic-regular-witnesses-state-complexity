@@ -1,0 +1,29 @@
+{
+  "creators": [
+    {
+      "affiliation": "Independent Researcher",
+      "name": "Yonezu, Ryutaro"
+    }
+  ],
+  "title": "Dynamic Regular Witnesses for Near-Exact State Complexity - source and audit package",
+  "version": "v1.0.0",
+  "access_right": "open",
+  "license": "mit",
+  "upload_type": "software",
+  "keywords": [
+    "anonymous dynamic networks",
+    "binary consensus",
+    "explicit termination",
+    "state complexity",
+    "periodic time",
+    "regular dynamic graphs",
+    "causal cones",
+    "local memory"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.22538052",
+      "relation": "references"
+    }
+  ]
+}
