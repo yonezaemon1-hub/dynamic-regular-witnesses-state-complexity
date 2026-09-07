@@ -1,0 +1,19 @@
+\section{Computational evidence}\label{sec:computational-evidence}
+
+The manuscript construction was independently exercised on 6,253 complete witness schedules: 3,653 quartic cases and 2,600 cubic cases, with zero implementation failures.  This exhaustive finite construction audit is supporting evidence and not a replacement for the analytic witness proofs.
+
+The additional script \texttt{audit/computational\_evidence.py} exports finite lower/upper tables over $n$ and $P$.  For example, at $n=20$ the quartic and cubic witnesses give the following best lower bounds against the common constructive upper bound.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{c|rrrrr}
+$P$ & 1 & 2 & 5 & 10 & 19 \\
+\hline
+best lower bound & 12 & 7 & 4 & 3 & 3 \\
+upper bound & 21 & 12 & 6 & 4 & 3
+\end{tabular}
+\caption{Representative finite state bounds for $n=20$.  The stronger even-$n$ cubic witness is included in the best lower bound.}
+\label{tab:dynamic-regular-finite}
+\end{table}
+
+The table makes two features visible: the finite gap shrinks as more periodic timing information is supplied, and the exact three-state threshold occurs at $P\ge n-1$.  The audit deliberately reports the interval rather than treating the near-exact theorem as an exact formula outside the regimes proved in the manuscript.
