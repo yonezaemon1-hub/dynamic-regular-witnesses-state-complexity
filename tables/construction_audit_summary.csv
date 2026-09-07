@@ -1,0 +1,4 @@
+witness_family,n_range,cases,failures
+quartic,15-40,3653,0
+cubic_even_n,12-40,2600,0
+combined,,6253,0
