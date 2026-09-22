@@ -34,3 +34,15 @@ The paper does **not** claim novelty for:
 - generic clock-memory or time-space tradeoffs.
 
 The scoped residual contribution is the task-specific use of regular dynamic witnesses to force a near-linear waiting sum for known-size explicitly terminating binary consensus under the stated one-bit periodic-phase model, plus the exact three-state phase threshold.
+
+## September 22, 2026 audit update
+
+The claim boundary was rechecked after publication of additional 2026 adjacent work.
+
+- U. Schmid, S. Felber, and H. Rincon Galeana, *A topological characterization of stabilizing consensus*, Distributed Computing 39, Article 17 (2026), DOI `10.1007/s00446-026-00508-z`, gives a general topological characterization of deterministic stabilizing consensus and distinguishes stabilizing from terminating consensus at the level of decision-function regularity.
+- Blanc–Di Luna–Viglietta remains important model-adjacent work because it studies deterministic computation with one-bit communications in anonymous dynamic networks.
+- Turau remains important task-adjacent work because randomized broadcast with stabilizing termination can use sublogarithmic local memory.
+
+**Updated boundary:** the paper does not claim novelty for the qualitative distinction between stabilization and termination. Its residual contribution is the quantitative, task-specific near-exact persistent-state complexity for explicitly terminating binary consensus with a free periodic phase, including the stated three-state threshold.
+
+This September 22 recheck did not identify a prior theorem reproducing the paper's quantitative `n-O(1)` lower numerator or exact three-state threshold in the same model. This remains a scoped literature-audit conclusion, not a certification of novelty.
