@@ -81,3 +81,7 @@ These computations are implementation/sanity audits, not mathematical proofs. Th
 Paper DOI: `10.5281/zenodo.22541243`  
 All-versions DOI: `10.5281/zenodo.22541242`  
 Software/source-package DOI: `10.5281/zenodo.22541098`
+
+## Research inquiries
+
+For questions about this research, reproduction, or collaboration, contact Yonezu Research Lab: [yonezaemon1+research@gmail.com](mailto:yonezaemon1+research@gmail.com).
